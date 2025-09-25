@@ -40,29 +40,39 @@ void load_env(const char* filename) {
         // replace = with null terminator, now trim to get key and value
         char* key = trim(trimmed);
         char* value = trim(eq + 1);
-        char env_entry[512];
-        // Save the key-value pair in the format KEY=VALUE
-        snprintf(env_entry, sizeof(env_entry), "%s=%s", key, value);
-        // Place in env
-        putenv(env_entry);
+        // Allocate memory for the environment string
+        size_t len = strlen(key) + strlen(value) + 2; // '=' and '\0'
+        char* env_entry = (char*)malloc(len);
+        if (!env_entry) {
+            fprintf(stderr, "Memory allocation failed for env_entry\n");
+            continue;
+        }
+        snprintf(env_entry, len, "%s=%s", key, value);
+        putenv(env_entry); // Do not free env_entry!
     }
     fclose(file);
 }
 
 int main(void) {
     load_env(".env");
-    const char* api_key = getenv("API_KEY");
+    const char* api_key = getenv("ALPACA_API_KEY");
     if (api_key) {
-        printf("API_KEY: %s\n", api_key);
+        printf("ALPACA_API_KEY: %s\n", api_key);
     } else {
-        printf("API_KEY not set\n");
+        printf("ALPACA_API_KEY not set\n");
+    }
+    const char* api_secret_key = getenv("ALPACA_API_SECRET_KEY");
+    if (api_secret_key) {
+        printf("ALPACA_API_SECRET_KEY: %s\n", api_secret_key);
+    } else {
+        printf("ALPACA_API_SECRET_KEY not set\n");
     }
     CURL *curl;
     CURLcode res;
 
     curl = curl_easy_init();
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "https://www.ivanleekaikiat.com");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://paper-api.alpaca.markets/v2");
         res = curl_easy_perform(curl);
         if(res != CURLE_OK)
             fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
