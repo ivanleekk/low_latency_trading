@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <curl/curl.h>
+#include "http.h"
 
 // Function to trim whitespace from start and end
 char* trim(char* str) {
@@ -57,29 +58,18 @@ int main(void) {
     load_env(".env");
     CURL *curl;
     CURLcode res;
+    struct curl_slist *headers = NULL;
+    char* api_key = getenv("ALPACA_API_KEY");
+    char* api_secret = getenv("ALPACA_API_SECRET_KEY");
+    char header_key[128];
+    char header_secret[128];
+    snprintf(header_key, sizeof(header_key), "APCA-API-KEY-ID: %s", api_key);
+    snprintf(header_secret, sizeof(header_secret), "APCA-API-SECRET-KEY: %s", api_secret); 
+    headers = curl_slist_append(headers, header_key);
+    headers = curl_slist_append(headers, header_secret);
 
-    curl = curl_easy_init();
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "https://paper-api.alpaca.markets/v2/account");
-        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
-        struct curl_slist *headers = NULL;
-        char* api_key = getenv("ALPACA_API_KEY");
-        char* api_secret = getenv("ALPACA_API_SECRET_KEY");
-        printf("API Key: %s\n", api_key);
-        printf("API Secret: %s\n", api_secret);
-        char header_key[128];
-        char header_secret[128];
-        snprintf(header_key, sizeof(header_key), "APCA-API-KEY-ID: %s", api_key);
-        snprintf(header_secret, sizeof(header_secret), "APCA-API-SECRET-KEY: %s", api_secret);
-        printf("Header Key: %s\n", header_key);
-        printf("Header Secret: %s\n", header_secret);
-        headers = curl_slist_append(headers, header_key);
-        headers = curl_slist_append(headers, header_secret);
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        res = curl_easy_perform(curl);
-        if(res != CURLE_OK)
-            fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        curl_easy_cleanup(curl);
-    }
+
+    curl = httpget("https://paper-api.alpaca.markets/v2/account", headers);
+
     return 0;
 }

@@ -1,4 +1,5 @@
 # Compile
+
 ```bash
-gcc main.c -lcurl -o main.exe
+gcc *.c -lcurl -o main.exe
 ```
