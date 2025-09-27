@@ -2,6 +2,6 @@
 #define http_h
 #include <curl/curl.h>
 
-CURL* httpget(const char* url, struct curl_slist* headers);
+void httpget(const char* url, struct curl_slist* headers, char* response, size_t response_size);
 
 #endif

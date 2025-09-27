@@ -4,6 +4,7 @@
 #include <string.h>
 #include <curl/curl.h>
 #include "http.h"
+#include "alpaca.h"
 
 // Function to trim whitespace from start and end
 char* trim(char* str) {
@@ -58,18 +59,14 @@ int main(void) {
     load_env(".env");
     CURL *curl;
     CURLcode res;
-    struct curl_slist *headers = NULL;
-    char* api_key = getenv("ALPACA_API_KEY");
-    char* api_secret = getenv("ALPACA_API_SECRET_KEY");
-    char header_key[128];
-    char header_secret[128];
-    snprintf(header_key, sizeof(header_key), "APCA-API-KEY-ID: %s", api_key);
-    snprintf(header_secret, sizeof(header_secret), "APCA-API-SECRET-KEY: %s", api_secret); 
-    headers = curl_slist_append(headers, header_key);
-    headers = curl_slist_append(headers, header_secret);
+    char response[8192] = {0};
 
 
-    curl = httpget("https://paper-api.alpaca.markets/v2/account", headers);
+    // curl = httpget("https://data.alpaca.markets/v2/stocks/bars/latest?symbols=AAPL", headers);
+    alpaca_get_account(response, sizeof(response));
 
+    printf("Response: %s", response);
+    alpaca_get_latest_bars("AAPL", response, sizeof(response));
+    printf("Response: %s", response);
     return 0;
 }
