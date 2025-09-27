@@ -48,3 +48,16 @@ void alpaca_get_latest_bars(const char* ticker, char* response, size_t response_
     httpget(url, headers, response, response_size);
     curl_slist_free_all(headers);
 }
+
+void alpaca_post_order(const char* order_json, char* response, size_t response_size) {
+    struct curl_slist *headers = alpaca_build_auth_headers();
+    if (!headers) {
+        snprintf(response, response_size, "missing API credentials");
+        return;
+    }
+
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    httppost("https://paper-api.alpaca.markets/v2/orders", headers, order_json, response, response_size);
+    curl_slist_free_all(headers);
+}

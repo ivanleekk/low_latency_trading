@@ -65,8 +65,10 @@ int main(void) {
     // curl = httpget("https://data.alpaca.markets/v2/stocks/bars/latest?symbols=AAPL", headers);
     alpaca_get_account(response, sizeof(response));
 
-    printf("Response: %s", response);
+    printf("Response: %s\n", response);
     alpaca_get_latest_bars("AAPL", response, sizeof(response));
-    printf("Response: %s", response);
+    printf("Response: %s\n", response);
+    alpaca_post_order("{\"symbol\":\"AAPL\",\"qty\":1,\"side\":\"buy\",\"type\":\"market\",\"time_in_force\":\"day\"}", response, sizeof(response));
+    printf("Response: %s\n", response);
     return 0;
 }
