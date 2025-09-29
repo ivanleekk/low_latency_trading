@@ -61,17 +61,18 @@ int main(void) {
     CURLcode res;
     char response[8192] = {0};
 
-
-    // curl = httpget("https://data.alpaca.markets/v2/stocks/bars/latest?symbols=AAPL", headers);
     alpaca_get_account(response, sizeof(response));
-
-    printf("Response: %s\n", response);
     alpaca_get_latest_bars("AAPL", response, sizeof(response));
-    printf("Response: %s\n", response);
+    printf("Latest Bars Response: %s\n", response);
     char order_json[256];
-    alpaca_create_order_json("AAPL", 1, "buy", "market", "day", order_json, sizeof(order_json));
-    printf("Order JSON: %s\n", order_json);
-    alpaca_post_order(order_json, response, sizeof(response));
-    printf("Response: %s\n", response);
+    // Check price condition here before placing order
+    Bars bars = alpaca_decode_bars_json(response);
+    if (bars.volume_weighted_average_price < 256.00) {
+        alpaca_create_order_json("AAPL", 1, "buy", "market", "day", order_json, sizeof(order_json));
+        alpaca_post_order(order_json, response, sizeof(response));
+        printf("Order Response: %s\n", response);
+    } else {
+        printf("Price condition not met, no order placed.\n");
+    }
     return 0;
 }
