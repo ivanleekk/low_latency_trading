@@ -61,3 +61,9 @@ void alpaca_post_order(const char* order_json, char* response, size_t response_s
     httppost("https://paper-api.alpaca.markets/v2/orders", headers, order_json, response, response_size);
     curl_slist_free_all(headers);
 }
+
+void alpaca_create_order_json(const char* symbol, int qty, const char* side, const char* type, const char* time_in_force, char* order_json, size_t order_json_size) {
+    snprintf(order_json, order_json_size,
+             "{\"symbol\":\"%s\",\"qty\":%d,\"side\":\"%s\",\"type\":\"%s\",\"time_in_force\":\"%s\"}",
+             symbol, qty, side, type, time_in_force);
+}

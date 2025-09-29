@@ -68,7 +68,10 @@ int main(void) {
     printf("Response: %s\n", response);
     alpaca_get_latest_bars("AAPL", response, sizeof(response));
     printf("Response: %s\n", response);
-    alpaca_post_order("{\"symbol\":\"AAPL\",\"qty\":1,\"side\":\"buy\",\"type\":\"market\",\"time_in_force\":\"day\"}", response, sizeof(response));
+    char order_json[256];
+    alpaca_create_order_json("AAPL", 1, "buy", "market", "day", order_json, sizeof(order_json));
+    printf("Order JSON: %s\n", order_json);
+    alpaca_post_order(order_json, response, sizeof(response));
     printf("Response: %s\n", response);
     return 0;
 }
