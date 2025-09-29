@@ -1,0 +1,1 @@
+int price_strategy(Bars bars);

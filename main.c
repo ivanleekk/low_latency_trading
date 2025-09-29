@@ -5,6 +5,7 @@
 #include <curl/curl.h>
 #include "http.h"
 #include "alpaca.h"
+#include "strategy.h"
 
 // Function to trim whitespace from start and end
 char* trim(char* str) {
@@ -64,15 +65,10 @@ int main(void) {
     alpaca_get_account(response, sizeof(response));
     alpaca_get_latest_bars("AAPL", response, sizeof(response));
     printf("Latest Bars Response: %s\n", response);
-    char order_json[256];
     // Check price condition here before placing order
     Bars bars = alpaca_decode_bars_json(response);
-    if (bars.volume_weighted_average_price < 256.00) {
-        alpaca_create_order_json("AAPL", 1, "buy", "market", "day", order_json, sizeof(order_json));
-        alpaca_post_order(order_json, response, sizeof(response));
-        printf("Order Response: %s\n", response);
-    } else {
-        printf("Price condition not met, no order placed.\n");
-    }
+    int trade_decision = price_strategy(bars);
+    // 1 for trade placed, 0 for no trade
+    printf("Trade Decision: %d\n", trade_decision);
     return 0;
 }
